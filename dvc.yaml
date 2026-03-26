@@ -1,0 +1,47 @@
+stages:
+
+  load:
+    cmd: .venv\Scripts\python.exe pipeline/load.py
+    deps:
+      - pipeline/load.py
+      - src/data_loader.py
+    params:
+      - data.dataset
+    outs:
+      - data/raw/reddit_data.csv
+
+  preprocess:
+    cmd: .venv\Scripts\python.exe pipeline/preprocess.py
+    deps:
+      - pipeline/preprocess.py
+      - src/preprocessor.py
+      - data/raw/reddit_data.csv
+    params:
+      - data.text_column
+      - data.target_column
+      - preprocess.max_features
+      - preprocess.max_df
+      - preprocess.min_df
+    outs:
+      - data/processed/df_processed.csv
+      - data/processed/X.npz
+      - data/processed/y.npy
+      - data/processed/vectorizer.joblib
+
+  train:
+    cmd: .venv\Scripts\python.exe pipeline/train.py
+    deps:
+      - pipeline/train.py
+      - src/model_trainer.py
+      - data/processed/X.npz
+      - data/processed/y.npy
+    params:
+      - train.test_size
+      - train.random_state
+    outs:
+      - models/logistic_regression.joblib
+      - models/naive_bayes.joblib
+      - models/random_forest.joblib
+    metrics:
+      - metrics/scores.json:
+          cache: false

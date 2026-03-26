@@ -1,0 +1,83 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# ─── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+# Notebooks (.ipynb) sao versionados pelo git
+
+# ─── Credenciais e Ambiente ───────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── DVC ──────────────────────────────────────────────────────────────────────
+# A pasta .dvc/ sobe para o git (contem config e .gitignore proprio do DVC)
+# O proprio .dvc/.gitignore ja exclui cache/ e tmp/ automaticamente
+# dvc.yaml, dvc.lock e params.yaml DEVEM ser versionados pelo git
+
+# ─── Data (DVC rastreia, git NAO versiona os arquivos de dados) ───────────────
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.pkl
+
+# ─── Models (DVC rastreia, git NAO versiona os binarios) ─────────────────────
+models/
+*.joblib
+*.h5
+*.pth
+*.onnx
+
+# ─── Metrics (scores.json eh rastreado pelo DVC com cache:false → git versiona)
+# metrics/scores.json NAO esta aqui intencionalmente
+
+# ─── MLFlow ───────────────────────────────────────────────────────────────────
+mlruns/
+mlflow_artifacts/
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Temporarios ──────────────────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp

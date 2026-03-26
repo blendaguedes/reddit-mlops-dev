@@ -1,0 +1,13 @@
+data:
+  dataset: pavellexyr/the-reddit-dataset-dataset
+  text_column: body
+  target_column: score
+
+preprocess:
+  max_features: 5000
+  max_df: 0.8
+  min_df: 5
+
+train:
+  test_size: 0.2
+  random_state: 42

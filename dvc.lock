@@ -1,0 +1,100 @@
+schema: '2.0'
+stages:
+  load:
+    cmd: .venv\Scripts\python.exe pipeline/load.py
+    deps:
+    - path: pipeline/load.py
+      hash: md5
+      md5: 8e62fe3e2f9577d26716b92d70d72f6e
+      size: 855
+    - path: src/data_loader.py
+      hash: md5
+      md5: b1c278c0b80f5dc490e9bdbe735c26c5
+      size: 3490
+    params:
+      params.yaml:
+        data.dataset: pavellexyr/the-reddit-dataset-dataset
+    outs:
+    - path: data/raw/reddit_data.csv
+      hash: md5
+      md5: 9ab9b3ad08287c9eac37c00add1f469d
+      size: 29998374
+  preprocess:
+    cmd: .venv\Scripts\python.exe pipeline/preprocess.py
+    deps:
+    - path: data/raw/reddit_data.csv
+      hash: md5
+      md5: 9ab9b3ad08287c9eac37c00add1f469d
+      size: 29998374
+    - path: pipeline/preprocess.py
+      hash: md5
+      md5: 85dfb1bf8be2828a57f680c325b5be7b
+      size: 1802
+    - path: src/preprocessor.py
+      hash: md5
+      md5: 0fa3843d809dd77cd02cc7ad0d0bc0c0
+      size: 4098
+    params:
+      params.yaml:
+        data.target_column: score
+        data.text_column: body
+        preprocess.max_df: 0.8
+        preprocess.max_features: 5000
+        preprocess.min_df: 5
+    outs:
+    - path: data/processed/X.npz
+      hash: md5
+      md5: 4e5acd04c654a8e5f6a3cb3ae50d2cb1
+      size: 5570511
+    - path: data/processed/df_processed.csv
+      hash: md5
+      md5: 74ed150d45459aa94f029bf6b9dfa99c
+      size: 29955756
+    - path: data/processed/vectorizer.joblib
+      hash: md5
+      md5: e96ff03749547f1ba071152be84549a3
+      size: 875822
+    - path: data/processed/y.npy
+      hash: md5
+      md5: 4125790d87a9fa9b2f27c22e7c1ebb19
+      size: 216372
+  train:
+    cmd: .venv\Scripts\python.exe pipeline/train.py
+    deps:
+    - path: data/processed/X.npz
+      hash: md5
+      md5: 4e5acd04c654a8e5f6a3cb3ae50d2cb1
+      size: 5570511
+    - path: data/processed/y.npy
+      hash: md5
+      md5: 4125790d87a9fa9b2f27c22e7c1ebb19
+      size: 216372
+    - path: pipeline/train.py
+      hash: md5
+      md5: ea7dc0534a77fb174738119ec1cb82eb
+      size: 1686
+    - path: src/model_trainer.py
+      hash: md5
+      md5: 2e56a9e72b731ac86e9f637ce2842e3b
+      size: 3062
+    params:
+      params.yaml:
+        train.random_state: 42
+        train.test_size: 0.2
+    outs:
+    - path: metrics/scores.json
+      hash: md5
+      md5: 9d6e5dbf669f1fcd0e0e3a3d0caa5bcb
+      size: 427
+    - path: models/logistic_regression.joblib
+      hash: md5
+      md5: 9539a7597584afd59df7ae8145e42c2c
+      size: 40815
+    - path: models/naive_bayes.joblib
+      hash: md5
+      md5: d2674cb66a88d778f4ab631a9d430ea2
+      size: 160791
+    - path: models/random_forest.joblib
+      hash: md5
+      md5: bf980cef197e741dec477b703bcc6428
+      size: 222683657
