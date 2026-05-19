@@ -5,12 +5,12 @@ stages:
     deps:
     - path: pipeline/load.py
       hash: md5
-      md5: 8e62fe3e2f9577d26716b92d70d72f6e
-      size: 855
+      md5: 55af6cebeff7a73f203095e2163e5904
+      size: 886
     - path: src/data_loader.py
       hash: md5
-      md5: b1c278c0b80f5dc490e9bdbe735c26c5
-      size: 3490
+      md5: 6d1808989ce2dbc9216232fde633e790
+      size: 3593
     params:
       params.yaml:
         data.dataset: pavellexyr/the-reddit-dataset-dataset
@@ -28,12 +28,12 @@ stages:
       size: 29998374
     - path: pipeline/preprocess.py
       hash: md5
-      md5: 85dfb1bf8be2828a57f680c325b5be7b
-      size: 1802
+      md5: b02a684cba0632acb7fded0daa368584
+      size: 1858
     - path: src/preprocessor.py
       hash: md5
-      md5: 0fa3843d809dd77cd02cc7ad0d0bc0c0
-      size: 4098
+      md5: 11b7a06a0e9f71364ca58609c098addb
+      size: 4225
     params:
       params.yaml:
         data.target_column: score
@@ -52,7 +52,7 @@ stages:
       size: 29955756
     - path: data/processed/vectorizer.joblib
       hash: md5
-      md5: e96ff03749547f1ba071152be84549a3
+      md5: 3b2f86baf80e48b13fcc7f46978f8e8b
       size: 875822
     - path: data/processed/y.npy
       hash: md5
@@ -71,30 +71,19 @@ stages:
       size: 216372
     - path: pipeline/train.py
       hash: md5
-      md5: ea7dc0534a77fb174738119ec1cb82eb
-      size: 1686
-    - path: src/model_trainer.py
-      hash: md5
-      md5: 2e56a9e72b731ac86e9f637ce2842e3b
-      size: 3062
+      md5: a55fac67536ffb3e3359fc0307cff227
+      size: 4295
     params:
       params.yaml:
+        train.models:
+          logistic_regression:
+            max_iter: 1000
+            random_state: 42
+          naive_bayes: {}
         train.random_state: 42
         train.test_size: 0.2
     outs:
     - path: metrics/scores.json
       hash: md5
-      md5: 9d6e5dbf669f1fcd0e0e3a3d0caa5bcb
-      size: 427
-    - path: models/logistic_regression.joblib
-      hash: md5
-      md5: 9539a7597584afd59df7ae8145e42c2c
-      size: 40815
-    - path: models/naive_bayes.joblib
-      hash: md5
-      md5: d2674cb66a88d778f4ab631a9d430ea2
-      size: 160791
-    - path: models/random_forest.joblib
-      hash: md5
-      md5: bf980cef197e741dec477b703bcc6428
-      size: 222683657
+      md5: a942f56981a649cba9f8096a2c8b28a3
+      size: 287

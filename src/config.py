@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Carregar .env
 load_dotenv()
@@ -28,7 +29,9 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # MLFlow
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", f"file:{MLFLOW_PATH}")
-MLFLOW_ARTIFACT_LOCATION = os.getenv("MLFLOW_ARTIFACT_LOCATION", str(PROJECT_ROOT / "mlflow_artifacts"))
+MLFLOW_ARTIFACT_LOCATION = os.getenv(
+    "MLFLOW_ARTIFACT_LOCATION", str(PROJECT_ROOT / "mlflow_artifacts")
+)
 
 # Model config
 TEST_SIZE = 0.2
@@ -37,6 +40,12 @@ MAX_FEATURES = 5000
 MAX_DF = 0.8
 MIN_DF = 5
 
+# Champion model (NOVO)
+CHAMPION_MODEL = os.getenv("CHAMPION_MODEL", "logistic_regression")
+MODEL_PATH = MODELS_PATH / f"{CHAMPION_MODEL}.joblib"
+VECTORIZER_PATH = MODELS_PATH / "vectorizer.joblib"
+
 print(f"Config loaded (ENV={ENV})")
 print(f"Data path: {PROCESSED_DATA_PATH}")
 print(f"Models path: {MODELS_PATH}")
+print(f"Champion model: {CHAMPION_MODEL}")

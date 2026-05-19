@@ -3,7 +3,6 @@ numpy==1.24.3
 pandas==2.1.3
 scikit-learn==1.3.2
 scipy==1.15.3
-xgboost==2.0.1
 
 # Data
 kagglehub>=1.0.0
@@ -11,14 +10,19 @@ kagglehub>=1.0.0
 # MLFlow (local)
 mlflow==2.9.1
 
-# Visualization
-matplotlib==3.8.0
-seaborn==0.13.0
+# DVC (versionamento de dados e pipeline)
+dvc==3.47.0
+pathspec==0.11.2  # 0.12+ removed _DIR_MARK which dvc 3.47.0 requires
 
 # Utilities
 python-dotenv==1.0.0
 tqdm==4.66.1
 
-# Development
-jupyter==1.0.0
-ipython==8.17.2
+# API
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+
+# Cloud
+google-cloud-run==0.10.0
+google-cloud-storage==2.10.0

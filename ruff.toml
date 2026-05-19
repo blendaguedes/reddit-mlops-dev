@@ -1,0 +1,18 @@
+line-length = 88
+extend-exclude = [".venv", ".dvc", "mlruns"]
+
+[lint]
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes (imports nao usados, variaveis indefinidas)
+    "I",  # isort (ordenacao de imports)
+]
+ignore = [
+    "E501",  # line too long — ruff format ja cuida disso
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["F401"]  # imports nao usados em testes sao normais
+
+[format]
+quote-style = "double"
