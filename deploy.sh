@@ -12,16 +12,14 @@ REGION=us-central1
 echo "Autenticando no GCP..."
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
 
-# Build da imagem (sem enviar source)
-echo "Building Docker image..."
+# Build da imagem
+echo "🔨 Building Docker image..."
 gcloud builds submit \
-  --no-source \
-  --config=cloudbuild.yaml \
-  --substitutions=_SERVICE_NAME=$SERVICE_NAME,_PROJECT_ID=$PROJECT_ID \
+  --tag gcr.io/$PROJECT_ID/$SERVICE_NAME:latest \
   --project=$PROJECT_ID
 
 # Deploy no Cloud Run
-echo "Deploying to Cloud Run..."
+echo "🚀 Deploying to Cloud Run..."
 gcloud run deploy $SERVICE_NAME \
   --image gcr.io/$PROJECT_ID/$SERVICE_NAME:latest \
   --platform managed \
@@ -30,5 +28,5 @@ gcloud run deploy $SERVICE_NAME \
   --set-env-vars MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI,DAGSHUB_USERNAME=$DAGSHUB_USERNAME,DAGSHUB_TOKEN=$DAGSHUB_TOKEN,CHAMPION_MODEL=$CHAMPION_MODEL \
   --project=$PROJECT_ID
 
-echo "Deploy concluído!"
+echo "✅ Deploy concluído!"
 gcloud run services describe $SERVICE_NAME --platform managed --region $REGION --project=$PROJECT_ID
