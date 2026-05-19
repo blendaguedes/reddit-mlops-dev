@@ -1,9 +1,11 @@
+import logging
+from pathlib import Path
+
 import kagglehub
 import pandas as pd
-from pathlib import Path
-import logging
 
 logger = logging.getLogger(__name__)
+
 
 class RedditDataLoader:
     """Carregar dataset do Reddit do Kaggle"""
@@ -90,14 +92,14 @@ class RedditDataLoader:
 
     def explore_data(self, df: pd.DataFrame):
         """Explorar dados carregados"""
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("EXPLORACAO DOS DADOS")
-        print("="*50)
+        print("=" * 50)
         print(f"Shape: {df.shape}")
         print(f"\nColunas: {list(df.columns)}")
         print(f"\nTipos:\n{df.dtypes}")
-        print(f"\nPrimeiras linhas:")
+        print("\nPrimeiras linhas:")
         print(df.head())
         print(f"\nValores nulos:\n{df.isnull().sum()}")
-        print(f"\nEstatisticas:")
+        print("\nEstatisticas:")
         print(df.describe())

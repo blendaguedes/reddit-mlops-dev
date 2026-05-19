@@ -71,14 +71,15 @@ stages:
       size: 216372
     - path: pipeline/train.py
       hash: md5
-      md5: 11c70eeaee5c388c4cc70514ec4bec33
-      size: 2385
-    - path: src/model_trainer.py
-      hash: md5
-      md5: d91da697d87ae13cbb4d2381118ddd2d
-      size: 3391
+      md5: a55fac67536ffb3e3359fc0307cff227
+      size: 4295
     params:
       params.yaml:
+        train.models:
+          logistic_regression:
+            max_iter: 1000
+            random_state: 42
+          naive_bayes: {}
         train.random_state: 42
         train.test_size: 0.2
     outs:
@@ -86,15 +87,3 @@ stages:
       hash: md5
       md5: a942f56981a649cba9f8096a2c8b28a3
       size: 287
-    - path: models/logistic_regression.joblib
-      hash: md5
-      md5: 9539a7597584afd59df7ae8145e42c2c
-      size: 40815
-    - path: models/naive_bayes.joblib
-      hash: md5
-      md5: d2674cb66a88d778f4ab631a9d430ea2
-      size: 160791
-    - path: models/vectorizer.joblib
-      hash: md5
-      md5: 3b2f86baf80e48b13fcc7f46978f8e8b
-      size: 875822

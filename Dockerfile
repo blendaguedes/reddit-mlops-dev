@@ -20,9 +20,8 @@ WORKDIR /app
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 
-# Copiar código e modelos
+# Copiar apenas o código — modelos e vectorizer são baixados do DagsHub no startup
 COPY src/ src/
-COPY models/ models/
 COPY params.yaml .
 
 # Expor porta da API

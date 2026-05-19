@@ -32,17 +32,12 @@ stages:
     cmd: .venv\Scripts\python.exe pipeline/train.py
     deps:
       - pipeline/train.py
-      - src/model_trainer.py
       - data/processed/X.npz
       - data/processed/y.npy
     params:
       - train.test_size
       - train.random_state
-    outs:
-      - models/logistic_regression.joblib
-      - models/naive_bayes.joblib
-      - models/vectorizer.joblib
-      # - models/random_forest.joblib
+      - train.models
     metrics:
       - metrics/scores.json:
           cache: false

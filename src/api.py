@@ -1,101 +1,104 @@
-from fastapi import FastAPI
-import joblib
-import logging
 import json
+import logging
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime
-from src.config import MODEL_PATH, VECTORIZER_PATH, CHAMPION_MODEL
+
+import joblib
+import mlflow
+import mlflow.sklearn
+from fastapi import FastAPI
+from mlflow import MlflowClient
+
 from src.schemas import PredictRequest, PredictResponse
 
-# Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ===== FastAPI App =====
-app = FastAPI(
-    title='Reddit Engagement Predictor API',
-    description='Classifica posts do Reddit como alto/baixo engajamento',
-    version='1.0'
-)
-
-# ===== State =====
 model = None
 vectorizer = None
+champion_name = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global model, vectorizer
-    model = joblib.load(MODEL_PATH)
-    vectorizer = joblib.load(VECTORIZER_PATH)
-    logger.info(f"Modelo carregado: {MODEL_PATH}")
+    global model, vectorizer, champion_name
+
+    os.environ["MLFLOW_TRACKING_USERNAME"] = os.environ["DAGSHUB_USERNAME"]
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ["DAGSHUB_TOKEN"]
+    mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
+
+    # Permite trocar o modelo em produção sem redeploy
+    # Fallback para logistic_regression pois é o modelo padrão registrado no MLflow após o primeiro treino.
+    champion = os.environ.get("CHAMPION_MODEL", "logistic_regression")
+    champion_name = champion
+
+    client = MlflowClient()
+    versions = client.get_latest_versions(champion)
+    if not versions:
+        raise RuntimeError(
+            f"Nenhuma versao encontrada para o modelo '{champion}' no MLflow"
+        )
+    mv = versions[0]
+
+    model = mlflow.sklearn.load_model(f"models:/{champion}/{mv.version}")
+
+    vec_local = mlflow.artifacts.download_artifacts(
+        run_id=mv.run_id, artifact_path="vectorizer.joblib"
+    )
+    vectorizer = joblib.load(vec_local)
+
+    logger.info(
+        f"Modelo '{champion}' v{mv.version} (run {mv.run_id}) carregado do DagsHub"
+    )
     yield
     logger.info("Encerrando API")
 
-app = FastAPI(
-    title='Reddit Engagement Predictor API',
-    description='Classifica posts do Reddit como alto/baixo engajamento',
-    version='1.0',
-    lifespan=lifespan
-)
-
-# ... resto do código
 
 app = FastAPI(
-    title='Reddit Engagement Predictor API',
-    description='Classifica posts do Reddit como alto/baixo engajamento',
-    version='1.0',
-    lifespan=lifespan
+    title="Reddit Engagement Predictor API",
+    description="Classifica posts do Reddit como alto/baixo engajamento",
+    version="1.0",
+    lifespan=lifespan,
 )
 
-# ===== Health Check =====
-@app.get('/health', tags=['Health'])
+
+@app.get("/health", tags=["Health"])
 def health_check():
-    """Verifica saúde da API"""
     return {
-        'status': 'ok',
-        'model': 'loaded' if model else 'not_loaded',
-        'vectorizer': 'loaded' if vectorizer else 'not_loaded',
-        'champion_model': CHAMPION_MODEL
+        "status": "ok",
+        "model": "loaded" if model else "not_loaded",
+        "vectorizer": "loaded" if vectorizer else "not_loaded",
     }
 
-# ===== Prediction =====
-@app.post('/predict', response_model=PredictResponse, tags=['Prediction'])
+
+@app.post("/predict", response_model=PredictResponse, tags=["Prediction"])
 async def predict(request: PredictRequest) -> PredictResponse:
-    """Faz predição de engajamento para um texto"""
-    
     try:
-        # Vetorizar texto
         X = vectorizer.transform([request.text])
-        
-        # Predição
         pred = model.predict(X)[0]
         prob = model.predict_proba(X)[0][1]
-        
-        # Log estruturado
-        log_entry = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'text_length': len(request.text),
-            'prediction': int(pred),
-            'probability': float(prob)
-        }
-        logger.info(json.dumps(log_entry))
-        
-        return PredictResponse(
-            prediction=int(pred),
-            probability=float(prob)
+
+        logger.info(
+            json.dumps(
+                {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "text_length": len(request.text),
+                    "prediction": int(pred),
+                    "probability": float(prob),
+                }
+            )
         )
-    
+
+        return PredictResponse(
+            prediction=int(pred), probability=float(prob), model=champion_name
+        )
+
     except Exception as e:
-        logger.error(f'Erro na predição: {e}')
+        logger.error(f"Erro na predicao: {e}")
         raise
 
-# ===== Root =====
-@app.get('/', tags=['Info'])
+
+@app.get("/", tags=["Info"])
 def root():
-    """Informação da API"""
-    return {
-        'name': 'Reddit Engagement Predictor',
-        'version': '1.0',
-        'docs': '/docs',
-        'champion_model': CHAMPION_MODEL
-    }
+    return {"name": "Reddit Engagement Predictor", "version": "1.0", "docs": "/docs"}

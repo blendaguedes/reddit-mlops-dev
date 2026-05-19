@@ -1,13 +1,15 @@
-import re
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from scipy.sparse import save_npz, load_npz
-from sklearn.feature_extraction.text import TfidfVectorizer
-import joblib
 import logging
+import re
+from pathlib import Path
+
+import joblib
+import numpy as np
+import pandas as pd
+from scipy.sparse import load_npz, save_npz
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 logger = logging.getLogger(__name__)
+
 
 class TextPreprocessor:
     """Preprocessar textos do Reddit e persistir artefatos em disco"""
@@ -39,12 +41,14 @@ class TextPreprocessor:
 
     def is_processed(self) -> bool:
         """Verifica se os artefatos processados ja existem em disco"""
-        return all([
-            self._df_path.exists(),
-            self._X_path.exists(),
-            self._y_path.exists(),
-            self._vectorizer_path.exists(),
-        ])
+        return all(
+            [
+                self._df_path.exists(),
+                self._X_path.exists(),
+                self._y_path.exists(),
+                self._vectorizer_path.exists(),
+            ]
+        )
 
     @staticmethod
     def clean_text(text):
@@ -52,14 +56,14 @@ class TextPreprocessor:
         if not isinstance(text, str):
             return ""
         text = text.lower()
-        text = re.sub(r'http\S+|www\S+', '', text)
-        text = re.sub(r'@\w+', '', text)
-        text = re.sub(r'#(\w+)', r'\1', text)
-        text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-        text = ' '.join(text.split())
+        text = re.sub(r"http\S+|www\S+", "", text)
+        text = re.sub(r"@\w+", "", text)
+        text = re.sub(r"#(\w+)", r"\1", text)
+        text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+        text = " ".join(text.split())
         return text
 
-    def run(self, df: pd.DataFrame, text_column='body'):
+    def run(self, df: pd.DataFrame, text_column="body"):
         """
         Executa o preprocessing completo e salva todos os artefatos em disco.
         Se os artefatos ja existem, carrega do disco sem reprocessar.
@@ -74,8 +78,8 @@ class TextPreprocessor:
         print(f"Preprocessando textos ({len(df)} linhas)...")
 
         # Limpar textos
-        df['cleaned_text'] = df[text_column].fillna('').apply(self.clean_text)
-        df = df[df['cleaned_text'].str.len() > 0].reset_index(drop=True)
+        df["cleaned_text"] = df[text_column].fillna("").apply(self.clean_text)
+        df = df[df["cleaned_text"].str.len() > 0].reset_index(drop=True)
         print(f"{len(df)} linhas apos limpeza")
 
         # Fit e transform TF-IDF
@@ -83,15 +87,15 @@ class TextPreprocessor:
             max_features=self.max_features,
             max_df=self.max_df,
             min_df=self.min_df,
-            stop_words='english'
+            stop_words="english",
         )
-        X = self.vectorizer.fit_transform(df['cleaned_text'])
+        X = self.vectorizer.fit_transform(df["cleaned_text"])
         print(f"Vectorizer fitted ({X.shape[1]} features), matriz: {X.shape}")
 
         # Criar target (score acima da mediana = 1)
-        if 'score' in df.columns:
-            median_score = df['score'].median()
-            y = (df['score'] > median_score).astype(int).values
+        if "score" in df.columns:
+            median_score = df["score"].median()
+            y = (df["score"] > median_score).astype(int).values
         else:
             rng = np.random.default_rng(42)
             y = rng.integers(0, 2, len(df))

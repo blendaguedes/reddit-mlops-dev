@@ -7,23 +7,27 @@ Le data/raw/reddit_data.csv, limpa textos, vetoriza com TF-IDF e salva:
   - data/processed/vectorizer.joblib
 Executado pelo DVC: dvc run ou dvc repro
 """
+
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import yaml
 import pandas as pd
+import yaml
+
+from src.config import PROCESSED_DATA_PATH, RAW_DATA_PATH
 from src.preprocessor import TextPreprocessor
-from src.config import RAW_DATA_PATH, PROCESSED_DATA_PATH
+
 
 def main():
     with open("params.yaml") as f:
         params = yaml.safe_load(f)
 
-    text_column   = params["data"]["text_column"]
-    max_features  = params["preprocess"]["max_features"]
-    max_df        = params["preprocess"]["max_df"]
-    min_df        = params["preprocess"]["min_df"]
+    text_column = params["data"]["text_column"]
+    max_features = params["preprocess"]["max_features"]
+    max_df = params["preprocess"]["max_df"]
+    min_df = params["preprocess"]["min_df"]
 
     print(f"Carregando dados brutos de: {RAW_DATA_PATH / 'reddit_data.csv'}")
     df = pd.read_csv(RAW_DATA_PATH / "reddit_data.csv", low_memory=False)
@@ -51,6 +55,7 @@ def main():
 
     print(f"Stage preprocess concluido: X={X.shape}, y={y.shape}")
     print(f"Artefatos salvos em: {PROCESSED_DATA_PATH}")
+
 
 if __name__ == "__main__":
     main()

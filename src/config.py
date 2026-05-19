@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Carregar .env
 load_dotenv()
@@ -28,7 +29,9 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # MLFlow
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", f"file:{MLFLOW_PATH}")
-MLFLOW_ARTIFACT_LOCATION = os.getenv("MLFLOW_ARTIFACT_LOCATION", str(PROJECT_ROOT / "mlflow_artifacts"))
+MLFLOW_ARTIFACT_LOCATION = os.getenv(
+    "MLFLOW_ARTIFACT_LOCATION", str(PROJECT_ROOT / "mlflow_artifacts")
+)
 
 # Model config
 TEST_SIZE = 0.2
