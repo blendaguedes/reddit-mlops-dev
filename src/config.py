@@ -37,6 +37,12 @@ MAX_FEATURES = 5000
 MAX_DF = 0.8
 MIN_DF = 5
 
+# Champion model (NOVO)
+CHAMPION_MODEL = os.getenv("CHAMPION_MODEL", "logistic_regression")
+MODEL_PATH = MODELS_PATH / f"{CHAMPION_MODEL}.joblib"
+VECTORIZER_PATH = MODELS_PATH / "vectorizer.joblib"
+
 print(f"Config loaded (ENV={ENV})")
 print(f"Data path: {PROCESSED_DATA_PATH}")
 print(f"Models path: {MODELS_PATH}")
+print(f"Champion model: {CHAMPION_MODEL}")

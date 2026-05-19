@@ -41,7 +41,8 @@ stages:
     outs:
       - models/logistic_regression.joblib
       - models/naive_bayes.joblib
-      - models/random_forest.joblib
+      - models/vectorizer.joblib
+      # - models/random_forest.joblib
     metrics:
       - metrics/scores.json:
           cache: false

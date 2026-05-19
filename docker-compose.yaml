@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mlflow:     # Nome do serviço
+    image: ghcr.io/mlflow/mlflow:latest # Imagem oficial do MLflow  
+    ports:
+      - '5000:5000' # Mapeia a porta 5000 do container para a porta 5000 do host
+    command: mlflow server --host 0.0.0.0 # Comando para iniciar o servidor MLflow
+    volumes:
+      - ./mlruns:/app/mlruns # Mapeia o diretório mlruns do host para o diretório mlruns do container
+    networks:
+      - reddit-mlops # Conecta o serviço mlflow à rede reddit-mlops
+
+  api: # Nome do serviço
+    build: .
+    ports:
+      - '8000:8000'
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000  # DNS automático! 
+      # "mlflow" resolve para o IP do serviço mlflow
+      # Docker resolve automaticamente!
+      - DEBUG=true
+    depends_on:
+      - mlflow
+      # depends_on só garante ordem, NÃO garante que MLflow está pronto. 
+      # A API pode tentar conectar antes de MLflow estar listening.
+    volumes:
+      - ./models:/app/models
+      # API consegue acessar modelos treinados
+    networks:
+      - reddit-mlops
+
+networks:
+  reddit-mlops:
+    driver: bridge

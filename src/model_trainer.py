@@ -1,12 +1,12 @@
 import mlflow
 import mlflow.sklearn
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 import numpy as np
-import joblib
 from pathlib import Path
 import logging
 
@@ -16,7 +16,7 @@ class ModelTrainer:
     """Treinar modelos de classificacao"""
 
     def __init__(self, models_path: Path = None):
-        self.models_path = Path(models_path or "./models")
+        self.models_path = Path(models_path) if models_path else Path("models")
         self.models_path.mkdir(parents=True, exist_ok=True)
 
     def create_models(self):
@@ -24,7 +24,7 @@ class ModelTrainer:
         return {
             'logistic_regression': LogisticRegression(max_iter=1000, random_state=42),
             'naive_bayes': MultinomialNB(),
-            'random_forest': RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
+            # 'random_forest': RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
         }
 
     def train_models(self, X, y, experiment_name="reddit_classification", test_size=0.2):
@@ -67,17 +67,23 @@ class ModelTrainer:
                 mlflow.log_param("model_type", model_name)
                 mlflow.log_params(model.get_params())
                 mlflow.log_metrics(metrics)
-                mlflow.sklearn.log_model(model, model_name)
+                mlflow.sklearn.log_model(
+                    model,
+                    artifact_path=model_name,
+                    registered_model_name=model_name,
+                )
 
-                model_path = self.models_path / f"{model_name}.joblib"
-                joblib.dump(model, model_path)
-                print(f"Salvo em: {model_path}")
+                run_id = mlflow.active_run().info.run_id
+                print(f"Modelo '{model_name}' registrado no DagsHub. Run ID: {run_id}")
+
+                model_file = self.models_path / f"{model_name}.joblib"
+                joblib.dump(model, model_file)
+                print(f"Modelo salvo em: {model_file}")
 
                 results[model_name] = {
                     'model': model,
                     'metrics': metrics,
-                    'path': model_path,
-                    'run_id': mlflow.active_run().info.run_id,
+                    'run_id': run_id,
                 }
 
                 print(f"Metrics: {metrics}")
