@@ -1,26 +1,26 @@
 steps:
-  # Build da imagem Docker
+  # Clone do repositório
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', 'https://github.com/SEU_USUARIO/SEU_REPO.git', '.']
+    env:
+      - 'BRANCH_NAME=main'
+
+  # Build da imagem
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+      - 'gcr.io/$PROJECT_ID/reddit-mlops:latest'
       - '.'
-    env:
-      - 'CLOUDSDK_BUILD_TIMEOUT=1200'
 
   # Push para Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+      - 'gcr.io/$PROJECT_ID/reddit-mlops:latest'
 
 images:
-  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
-
-substitutions:
-  _SERVICE_NAME: 'reddit-mlops'
-  _PROJECT_ID: ''
+  - 'gcr.io/$PROJECT_ID/reddit-mlops:latest'
 
 options:
   machineType: 'N1_HIGHCPU_8'

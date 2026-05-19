@@ -1,26 +1,21 @@
 #!/bin/bash
 
-# deploy.sh - Deploy para Google Cloud Run
-
 set -e
 
 PROJECT_ID=$1
 SERVICE_NAME=reddit-mlops
 REGION=us-central1
 
-# Autenticar no GCP
 echo "Autenticando no GCP..."
 gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+gcloud auth configure-docker
 
-# Build da imagem (sem enviar source)
 echo "Building Docker image..."
-gcloud builds submit \
-  --no-source \
-  --config=cloudbuild.yaml \
-  --substitutions=_SERVICE_NAME=$SERVICE_NAME,_PROJECT_ID=$PROJECT_ID \
-  --project=$PROJECT_ID
+docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:latest .
 
-# Deploy no Cloud Run
+echo "Pushing to Container Registry..."
+docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+
 echo "Deploying to Cloud Run..."
 gcloud run deploy $SERVICE_NAME \
   --image gcr.io/$PROJECT_ID/$SERVICE_NAME:latest \
